@@ -1,11 +1,14 @@
+server:
+  port: 8081
+
 spring:
   application:
-    name: greenmangaming-monitor
+    name: steamwishlist-monitor
   mail:
     host: smtp.gmail.com
     port: 587
-    username: paulloestevam@gmail.com
-    password: aaaa bbbb cccc dddd # Senha de app
+    username: aaaa@gmail.com
+    password: aaaa aaaa aaaa aaaa # Senha de app
     properties:
       mail:
         smtp:
@@ -15,7 +18,7 @@ spring:
     default-encoding: UTF-8
 
 email:
-  sender: "paulloestevam@gmail.com"
+  sender: "aaaa@gmail.com"
 
 webdriver:
   chrome:
@@ -23,13 +26,12 @@ webdriver:
     # No Windows, passe o caminho via argumento na execução.
     driver-path: ""
 
-gmg:
+steam:
   urls:
-    - "https://www.greenmangaming.com/pt/hot-deals/"
+    - "https://store.steampowered.com/wishlist/id/paulloestevam/?sort=discount"
 
 scheduler:
-  time: "0 0 9 * * *" # Executa todo dia às 09:00
+  time: "0 0 11 * * *" # Executa todo dia às 09:00
 
 # Filtros
-minDiscountPercentage: 80
-productLineWidth: 300
+minDiscountPercentage: 74
