@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.0.2'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.hidetake.ssh' version '2.12.0'
 }
 
 group = 'com.paulloestevam'
@@ -26,7 +27,7 @@ dependencies {
 
 	// Selenium (Para automatizar o Chrome headless)
 	// Nota: O selenium-java já traz as dependências necessárias para interagir com o browser
-	implementation 'org.seleniumhq.selenium:selenium-java:4.28.1'
+	implementation 'org.seleniumhq.selenium:selenium-java:4.46.0'
 
 	// Jsoup (Para fazer o parse do HTML e extrair dados de forma leve)
 	implementation 'org.jsoup:jsoup:1.18.3'
@@ -42,4 +43,82 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// ===========================================================
+// Deploy para o Raspberry Pi
+// ===========================================================
+
+remotes {
+	raspberryPi {
+		host = '192.168.1.150'
+		user = 'paull'
+		identity = file("${System.properties['user.home']}/.ssh/id_ed25519")
+	}
+}
+
+def remoteDir = '/home/paull/steam-wishlist-monitor'
+def serviceName = 'steam-wishlist-monitor.service'
+
+task deploy_makeRemoteDir {
+	group = 'deployment'
+	description = 'Cria o diretório remoto no Raspberry Pi'
+	dependsOn tasks.bootJar
+	doLast {
+		ssh.run {
+			session(remotes.raspberryPi) {
+				execute "mkdir -p ${remoteDir}/logs"
+			}
+		}
+	}
+}
+
+task deploy_copyFiles {
+	group = 'deployment'
+	description = 'Copia o JAR e o arquivo de serviço para o Raspberry Pi'
+	dependsOn deploy_makeRemoteDir
+	doLast {
+		ssh.run {
+			session(remotes.raspberryPi) {
+				put from: tasks.bootJar.archiveFile.get().asFile, into: remoteDir
+				put from: file('src/main/resources/steam-wishlist-monitor.service'), into: remoteDir
+			}
+		}
+	}
+}
+
+task deploy_runCommands {
+	group = 'deployment'
+	description = 'Instala o serviço e reinicia a aplicação no Raspberry Pi'
+	dependsOn deploy_copyFiles
+	doLast {
+		ssh.run {
+			session(remotes.raspberryPi) {
+				execute """
+					set -e
+					echo "==> Instalando arquivo de serviço systemd..."
+					sudo cp ${remoteDir}/${serviceName} /etc/systemd/system/${serviceName}
+
+					echo "==> Recarregando systemd e reiniciando o serviço..."
+					sudo systemctl daemon-reload
+					sudo systemctl enable ${serviceName}
+					sudo systemctl restart ${serviceName}
+
+					echo "==> Status do serviço:"
+					sudo systemctl status ${serviceName} --no-pager || true
+				""".stripIndent()
+			}
+		}
+	}
+}
+
+task deploy {
+	group = 'deployment'
+	description = 'Faz o build e deploy completo da aplicação no Raspberry Pi.'
+	dependsOn deploy_runCommands
+	doLast {
+		println "Deploy finalizado com sucesso!"
+		println "Aplicação disponível em: http://192.168.1.150:8085"
+		println "Endpoint de teste: http://192.168.1.150:8085/api/trigger"
+	}
 }

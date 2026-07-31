@@ -7,7 +7,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: aaaa@gmail.com
+    username: paulloestevam@gmail.com
     password: aaaa aaaa aaaa aaaa # Senha de app
     properties:
       mail:
@@ -18,20 +18,41 @@ spring:
     default-encoding: UTF-8
 
 email:
-  sender: "aaaa@gmail.com"
+  sender: "paulloestevam@gmail.com"
+
+logging:
+  file:
+    name: logs/console.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      total-size-cap: 100MB
+      max-history: 7
+  level:
+    root: INFO
 
 webdriver:
   chrome:
-    # Deixe vazio no Linux se tiver instalado via apt.
-    # No Windows, passe o caminho via argumento na execução.
+    # Deixe vazio para usar Selenium Manager (recomendado - baixa automaticamente o chromedriver correto)
+    # Ou aponte o caminho completo do chromedriver.exe se preferir usar manualmente
     driver-path: ""
+  # Timeouts para requisições ao Steam
+  page-load-timeout-seconds: 30
+  implicit-wait-seconds: 15
 
 steam:
   urls:
     - "https://store.steampowered.com/wishlist/id/paulloestevam/?sort=discount"
+  # Delay entre requisições em milissegundos (prevenção de rate limiting)
+  # Mínimo recomendado: 15000 (15 segundos)
+  # Padrão: 20000 (20 segundos)
+  delay-between-requests-ms: 20000
+  # Retry configuration
+  max-retries: 3
+  retry-base-wait-ms: 10000  # Aguarda 10s, depois 20s, depois 40s
 
 scheduler:
-  time: "0 0 11 * * *" # Executa todo dia às 09:00
+  time: "0 0 11 * * *" # Executa todo dia às 11:00
 
 # Filtros
 minDiscountPercentage: 74
