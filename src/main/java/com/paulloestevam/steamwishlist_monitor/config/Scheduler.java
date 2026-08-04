@@ -14,10 +14,10 @@ public class Scheduler {
         this.service = service;
     }
 
-    @PostConstruct
-    public void init() {
-        fetchDealsPeriodically();
-    }
+//    @PostConstruct
+//    public void init() {
+//        fetchDealsPeriodically();
+//    }
 
     @Scheduled(cron = "${scheduler.time}")
     public void fetchDealsPeriodically() {

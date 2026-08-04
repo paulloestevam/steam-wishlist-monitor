@@ -4,11 +4,11 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
+// ...existing code...
 
 @Configuration
 @ConfigurationProperties(prefix = "steam")
 @Data
 public class SteamWishlistConfig {
-    private List<String> urls;
+    private String url;
 }

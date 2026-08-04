@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8085
 
 spring:
   application:
@@ -22,7 +22,10 @@ email:
 
 logging:
   file:
-    name: logs/console.log
+    # Use LOG_DIR environment variable to decide where logs are written
+    # LOG_DIR must be set in the environment (or as a -D system property) before starting the app
+    # Use LOG_DIR if set, otherwise fall back to local 'logs' folder
+    name: ${LOG_DIR:logs}/console.log
   logback:
     rollingpolicy:
       max-file-size: 10MB
@@ -30,6 +33,7 @@ logging:
       max-history: 7
   level:
     root: INFO
+    org.openqa.selenium: ERROR
 
 webdriver:
   chrome:
@@ -41,18 +45,13 @@ webdriver:
   implicit-wait-seconds: 15
 
 steam:
-  urls:
-    - "https://store.steampowered.com/wishlist/id/paulloestevam/?sort=discount"
-  # Delay entre requisições em milissegundos (prevenção de rate limiting)
-  # Mínimo recomendado: 15000 (15 segundos)
-  # Padrão: 20000 (20 segundos)
+  url: "https://store.steampowered.com/wishlist/id/paulloestevam/?sort=discount&min_discount=any"
+#  url: "https://store.steampowered.com/wishlist/id/paulloestevam/?sort=discount"
   delay-between-requests-ms: 20000
-  # Retry configuration
   max-retries: 3
   retry-base-wait-ms: 10000  # Aguarda 10s, depois 20s, depois 40s
 
 scheduler:
   time: "0 0 11 * * *" # Executa todo dia às 11:00
 
-# Filtros
-minDiscountPercentage: 74
+minDiscountPercentage: 60

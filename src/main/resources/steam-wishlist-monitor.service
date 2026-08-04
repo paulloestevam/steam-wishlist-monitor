@@ -5,14 +5,15 @@ After=network.target
 [Service]
 User=paull
 WorkingDirectory=/home/paull/steam-wishlist-monitor
+Environment=LOG_DIR=/home/paull/steam-wishlist-monitor/logs
 # Use o java do sistema (/usr/bin/java) e evite que quebras de linha confiram argumentos fora do ExecStart
 # Passe o caminho do chromedriver explicitamente com a propriedade system property
-ExecStart=/usr/bin/java -Dwebdriver.chrome.driver=/usr/bin/chromedriver -jar /home/paull/steam-wishlist-monitor/steam-wishlist-monitor-0.0.1-SNAPSHOT.jar --spring.mail.username=paulloestevam@gmail.com --spring.mail.password="jhtm bgml fhwr efyv" --email.sender=paulloestevam@gmail.com --scheduler.time='0 0 11 * * *' --minDiscountPercentage=65
+ExecStart=/usr/bin/java -Dwebdriver.chrome.driver=/usr/bin/chromedriver -jar /home/paull/steam-wishlist-monitor/steam-wishlist-monitor-0.0.1-SNAPSHOT.jar --server.port=8085 --spring.mail.host=smtp.gmail.com --spring.mail.port=587 --spring.mail.username=paulloestevam@gmail.com --spring.mail.password="aaaa aaaa aaaa aaaa" --spring.mail.properties.mail.smtp.auth=true --spring.mail.properties.mail.smtp.starttls.enable=true --spring.mail.default-encoding=UTF-8 --email.sender=paulloestevam@gmail.com --logging.file.name=$LOG_DIR/console.log --logging.logback.rollingpolicy.max-file-size=10MB --logging.logback.rollingpolicy.total-size-cap=100MB --logging.logback.rollingpolicy.max-history=7 --logging.level.root=INFO --webdriver.page-load-timeout-seconds=30 --webdriver.implicit-wait-seconds=15 --steam.url="https://store.steampowered.com/wishlist/id/paulloestevam/?sort=discount&min_discount=any" --steam.delay-between-requests-ms=20000 --steam.max-retries=3 --steam.retry-base-wait-ms=10000 --scheduler.time="0 0 11 * * *" --minDiscountPercentage=60
 Restart=always
 RestartSec=10
 # Garante que o systemd gerencie os arquivos de log com as permissões corretas
-StandardOutput=append:/home/paull/steam-wishlist-monitor/logs/monitor.log
-StandardError=append:/home/paull/steam-wishlist-monitor/logs/monitor.log
+StandardOutput=append:$LOG_DIR/monitor.log
+StandardError=append:$LOG_DIR/monitor.log
 
 [Install]
 WantedBy=multi-user.target

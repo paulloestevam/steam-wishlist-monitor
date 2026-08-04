@@ -62,8 +62,7 @@ No arquivo `application.yaml`, você pode ajustar:
 
 ```yaml
 steam:
-  urls:
-    - "https://store.steampowered.com/wishlist/id/seu_id/?sort=discount"
+  url: "https://store.steampowered.com/wishlist/id/seu_id/?sort=discount"
   delay-between-requests-ms: 20000     # Delay entre requisições
   max-retries: 3                        # Máximo de tentativas
   retry-base-wait-ms: 10000             # Espera base para retry

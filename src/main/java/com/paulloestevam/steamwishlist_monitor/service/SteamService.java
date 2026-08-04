@@ -106,26 +106,17 @@ public class SteamService {
                 // Se o CDP não estiver disponível, apenas registra e segue
                 log.warn("Não foi possível aplicar headers via CDP: {}", e.getMessage());
             }
-            List<String> urls = config.getUrls();
-
             // Usamos um Map para garantir que cada URL de jogo apareça apenas uma vez
             Map<String, Game> uniqueGames = new HashMap<>();
+            boolean processedSuccessfully = false;
 
-            for (int urlIndex = 0; urlIndex < urls.size(); urlIndex++) {
-                String url = urls.get(urlIndex);
-                log.info("Acessando wishlist ({}/{}): {}", urlIndex + 1, urls.size(), url);
-                
-                try {
-                    fetchWishlistWithRetry(driver, url, uniqueGames);
-                    
-                    // Adiciona delay entre requisições para evitar rate limiting (20 segundos)
-                    if (urlIndex < urls.size() - 1) {
-                        log.info("⏳ Aguardando 20 segundos antes da próxima requisição (prevenção de rate limiting)...");
-                        Thread.sleep(20000);
-                    }
-                } catch (Exception e) {
-                    log.error("❌ Erro ao processar URL {}: {}", url, e.getMessage());
-                }
+            String url = config.getUrl();
+            log.info("Acessando wishlist: {}", url);
+            try {
+                fetchWishlistWithRetry(driver, url, uniqueGames);
+                processedSuccessfully = true;
+            } catch (Exception e) {
+                log.error("❌ Erro ao processar URL {}: {}", url, e.getMessage());
             }
 
             List<Game> allGamesFound = new ArrayList<>(uniqueGames.values());
@@ -144,7 +135,8 @@ public class SteamService {
                 } else {
                     log.info("Nenhuma mudança nas ofertas em relação ao último log. E-mail não enviado.");
                 }
-            } else {
+            } else if (processedSuccessfully) {
+                // Só mostra "nenhuma oferta" se o processamento foi bem-sucedido
                 log.warn("Nenhuma oferta acima de {}% encontrada.", minDiscountPercentage);
             }
 
